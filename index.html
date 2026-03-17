@@ -23,8 +23,8 @@
     <div id="audio-container" class="hidden"></div>
 
     <!-- Top Navigation / Add Button -->
-    <div class="absolute top-6 right-6">
-        <button id="btn-open-modal" class="p-3 rounded-full bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-[#ECA400] hover:text-white hover:border-[#ECA400] transition-colors focus:outline-none focus:ring-2 focus:ring-[#ECA400] focus:ring-offset-2" title="Add New Card">
+    <div class="absolute top-6 right-6 z-50">
+        <button id="btn-open-modal" class="p-3 rounded-full bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-[#ECA400] hover:text-white hover:border-[#ECA400] transition-colors focus:outline-none focus:ring-2 focus:ring-[#ECA400] focus:ring-offset-2" title="Test New Card">
             <i class="ph ph-plus text-2xl"></i>
         </button>
     </div>
@@ -35,7 +35,7 @@
             Blackfeet Language Cards
         </h1>
         <p class="text-slate-500 font-medium" id="card-counter">
-            Loading database...
+            Loading cards from GitHub...
         </p>
     </div>
 
@@ -169,7 +169,8 @@
                 <i class="ph ph-x text-2xl"></i>
             </button>
             
-            <h3 class="text-2xl font-bold text-[#2C1E16] mb-6">Add New Card</h3>
+            <h3 class="text-2xl font-bold text-[#2C1E16] mb-6">Test a New Card</h3>
+            <p class="text-sm text-slate-500 mb-4 pb-4 border-b">Cards added here are temporary. To save them permanently, add them to your <code class="bg-slate-100 px-1 rounded">flashcards.json</code> file on GitHub!</p>
             
             <form id="add-card-form" class="space-y-4">
                 <div>
@@ -190,28 +191,23 @@
                 
                 <div class="pt-4">
                     <button type="submit" id="submit-card-btn" class="w-full py-4 bg-[#2C1E16] hover:bg-[#C22026] text-white rounded-xl font-bold text-lg transition-colors shadow-md disabled:opacity-50">
-                        Save to Database
+                        Add to Deck (Temporary)
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Module Script for Firebase and Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Setup Firebase
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    <!-- Script Logic -->
+    <script>
+        // =========================================================================
+        // YOUR GITHUB JSON FILE URL 
+        // We use the "raw" version to avoid CORS and HTML-parsing errors.
+        // =========================================================================
+        const GITHUB_JSON_URL = "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/main/flashcards.json";
 
         // State
-        let flashcardsData = []; // Now starts empty!
+        let flashcardsData = [];
         let currentIndex = 0;
         let isFlipped = false;
         let isPlaying = false;
@@ -239,9 +235,10 @@
         const addCardForm = document.getElementById('add-card-form');
         const submitBtn = document.getElementById('submit-card-btn');
 
-        // Helper function to convert standard GitHub URLs to raw URLs automatically
+        // URL Sanitizer to ensure we are always hitting raw endpoints
         function sanitizeGithubUrl(url) {
             if (!url) return url;
+            // Handle standard github.com/blob links
             if (url.includes('github.com') && url.includes('/blob/')) {
                 return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
             }
@@ -251,63 +248,306 @@
         // Initialization
         async function init() {
             try {
-                // 1. Authenticate with Firebase first
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                // Always try to sanitize the provided constant just in case
+                const targetUrl = sanitizeGithubUrl(GITHUB_JSON_URL);
+                
+                const response = await fetch(targetUrl);
+                
+                if (!response.ok) {
+                    throw new Error("Could not load the JSON file.");
                 }
 
-                // 2. Setup real-time listener
-                onAuthStateChanged(auth, (user) => {
-                    if (!user) return;
-                    
-                    const cardsRef = collection(db, 'artifacts', appId, 'public', 'data', 'flashcards');
-                    
-                    onSnapshot(cardsRef, (snapshot) => {
-                        let cards = [];
-                        snapshot.forEach(doc => {
-                            let data = doc.data();
-                            
-                            // Automatically fix any standard GitHub links saved to the database 
-                            // so the browser doesn't try to load an HTML page as an MP3!
-                            if (data.audioUrl) {
-                                data.audioUrl = sanitizeGithubUrl(data.audioUrl);
-                            }
-                            
-                            cards.push({ id: doc.id, ...data });
-                        });
-                        
-                        // Sort by when they were added
-                        cards.sort((a, b) => a.timestamp - b.timestamp);
-                        
-                        if (cards.length === 0) {
-                            // If DB is completely empty, seed it with your first 3 cards so you don't lose them!
-                            seedInitialData(cardsRef);
-                        } else {
-                            flashcardsData = cards;
-                            if (currentIndex >= flashcardsData.length) currentIndex = 0;
-                            
-                            syncAudioElements();
-                            createDots();
-                            renderCard(currentIndex);
-                            
-                            if (!bgGenerated) {
-                                generateBackgroundImage();
-                                bgGenerated = true;
-                            }
-                        }
-                    }, (error) => {
-                        console.error("Firestore error:", error);
-                    });
-                });
+                flashcardsData = await response.json();
+
+                if (flashcardsData.length === 0) {
+                    document.getElementById('card-counter').innerHTML = `<span class="text-red-500 font-bold">No cards found in JSON.</span>`;
+                    return;
+                }
+
+                syncAudioElements();
+                createDots();
+                renderCard(currentIndex);
+                
+                if (!bgGenerated) {
+                    generateBackgroundImage();
+                    bgGenerated = true;
+                }
+
             } catch (err) {
                 console.error("Initialization error:", err);
+                
+                // Fallback: If it can't find your link above, it will safely load the 3 defaults so the app doesn't break
+                document.getElementById('card-counter').innerHTML = `<span class="text-red-500">Failed to load JSON link. Loading defaults.</span>`;
+                
+                flashcardsData = [
+                    { id: 1, blackfeet: "Aahkitsimio'p niita'paisiksikimiyi", english: "Let's drink coffee.", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/eating_lets-drink-coffee.mp3" },
+                    { id: 2, blackfeet: "Aahsikskanaotonni", english: "Pleasant morning.", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/greetings_pleasant-morning.mp3" },
+                    { id: 3, blackfeet: "Áíkia'piiwa", english: "What's happening?", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/aikiapiiwa.mp3" }
+                ];
+                
+                syncAudioElements();
+                createDots();
+                renderCard(currentIndex);
+                if (!bgGenerated) {
+                    generateBackgroundImage();
+                    bgGenerated = true;
+                }
             }
         }
 
-        async function seedInitialData(cardsRef) {
-            const defaults = [
-                { blackfeet: "Aahkitsimio'p niita'paisiksikimiyi", english: "Let's drink coffee.", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/eating_lets-drink-coffee.mp3", timestamp: 1 },
-                { blackfeet: "Aahsikskanaotonni", english: "Pleasant morning.", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/greetings_pleasant-morning.mp3", timestamp: 2 },
-                { blackfeet: "Áíkia'piiwa", english: "What's happening?", audioUrl: "
+        async function fetchWithBackoff(url, options, retries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+        }
+
+        async function generateBackgroundImage() {
+            const apiKey = ""; 
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+            const promptText = "A beautiful, vibrant extreme wide-angle watercolor landscape painting of Chief Mountain in Glacier National Park, Montana seen from a vast distance. The horizon line is positioned low, exactly one-third up from the bottom edge of the canvas, allowing an expansive, large dynamic blue sky to dominate the top two-thirds of the frame. The distinct, massive blocky square-shaped rocky monolith sits dramatically in the distant grassy plains, positioned off-center towards the right side of the canvas. Expressive brush strokes, vast sweeping artistic landscape.";
+            
+            try {
+                const result = await fetchWithBackoff(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        instances: { prompt: promptText },
+                        parameters: { sampleCount: 1 }
+                    })
+                });
+                
+                if (result.predictions && result.predictions[0]) {
+                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    const imgEl = document.getElementById('bg-image');
+                    imgEl.src = imageUrl;
+                    imgEl.classList.remove('hidden');
+                    document.getElementById('bg-loading').classList.add('hidden');
+                } else {
+                    throw new Error("No image generated");
+                }
+            } catch (err) {
+                console.error("Failed to generate background image.", err);
+                document.getElementById('bg-loading').innerHTML = '<span class="text-sm text-[#C22026] font-medium text-center px-4">Failed to paint background.</span>';
+            }
+        }
+
+        function syncAudioElements() {
+            const container = document.getElementById('audio-container');
+            flashcardsData.forEach(card => {
+                if (card.audioUrl) {
+                    let audioEl = document.getElementById(`audio-${card.id}`);
+                    if (!audioEl) {
+                        audioEl = document.createElement('audio');
+                        audioEl.id = `audio-${card.id}`;
+                        audioEl.src = card.audioUrl;
+                        audioEl.preload = 'auto';
+                        audioEl.addEventListener('ended', () => {
+                            isPlaying = false;
+                            updatePlayButtonUI();
+                        });
+                        audioEl.addEventListener('error', (e) => {
+                            console.error(`Failed to load audio for card ${card.blackfeet} from URL: ${card.audioUrl}`);
+                        });
+                        container.appendChild(audioEl);
+                        audioEl.load();
+                    } else if (audioEl.src !== card.audioUrl) {
+                        audioEl.src = card.audioUrl;
+                        audioEl.load();
+                    }
+                }
+            });
+        }
+
+        function createDots() {
+            dotsContainer.innerHTML = '';
+            flashcardsData.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `h-2.5 rounded-full transition-all duration-300 mb-2 ${idx === currentIndex ? 'w-8 bg-[#005B9A]' : 'w-2.5 bg-slate-200'}`;
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function pauseAllAudio() {
+            const allAudio = document.querySelectorAll('#audio-container audio');
+            allAudio.forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+        }
+
+        function renderCard(index) {
+            const card = flashcardsData[index];
+            if (!card) return; 
+            
+            textBlackfeet.textContent = card.blackfeet;
+            textEnglish.textContent = card.english;
+            cardCounter.textContent = `Card ${index + 1} of ${flashcardsData.length}`;
+
+            pauseAllAudio();
+            isPlaying = false;
+            updatePlayButtonUI();
+
+            if (card.audioUrl) {
+                playBtnFront.style.display = 'flex';
+                playBtnBack.style.display = 'flex';
+                spacerFront.style.display = 'none';
+                spacerBack.style.display = 'none';
+            } else {
+                playBtnFront.style.display = 'none';
+                playBtnBack.style.display = 'none';
+                spacerFront.style.display = 'block';
+                spacerBack.style.display = 'block';
+            }
+
+            Array.from(dotsContainer.children).forEach((dot, idx) => {
+                dot.className = `h-2.5 rounded-full transition-all duration-300 mb-2 ${idx === currentIndex ? 'w-8 bg-[#005B9A]' : 'w-2.5 bg-slate-200'}`;
+            });
+        }
+
+        function toggleFlip() {
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                cardInner.classList.add('rotate-y-180');
+            } else {
+                cardInner.classList.remove('rotate-y-180');
+            }
+        }
+
+        function handleNext(e) {
+            if (e) e.stopPropagation();
+            if (isFlipped) toggleFlip();
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % flashcardsData.length;
+                renderCard(currentIndex);
+            }, 150);
+        }
+
+        function handlePrev(e) {
+            if (e) e.stopPropagation();
+            if (isFlipped) toggleFlip();
+            setTimeout(() => {
+                currentIndex = (currentIndex - 1 + flashcardsData.length) % flashcardsData.length;
+                renderCard(currentIndex);
+            }, 150);
+        }
+
+        function updatePlayButtonUI() {
+            const iconFront = playBtnFront.querySelector('i');
+            const iconBack = playBtnBack.querySelector('i');
+
+            if (isPlaying) {
+                playBtnFront.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-[#C22026] text-[#F0E5D1] shadow-lg scale-110 focus:outline-none border-2 border-[#C22026]";
+                iconFront.className = "ph ph-speaker-high text-3xl animate-pulse";
+                
+                playBtnBack.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-[#005B9A] text-white shadow-lg scale-110 focus:outline-none border-2 border-[#005B9A]";
+                iconBack.className = "ph ph-speaker-high text-3xl animate-pulse";
+            } else {
+                playBtnFront.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 focus:outline-none border-2 border-[#2C1E16] text-[#2C1E16] bg-transparent hover:bg-[#ECA400]";
+                iconFront.className = "ph ph-speaker-high text-3xl";
+
+                playBtnBack.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-white/60 backdrop-blur-sm text-[#2C1E16] hover:bg-white hover:text-[#005B9A] focus:outline-none border-2 border-[#2C1E16]/30 hover:border-[#005B9A] shadow-sm";
+                iconBack.className = "ph ph-speaker-high text-3xl";
+            }
+        }
+
+        function toggleAudio(e) {
+            e.stopPropagation();
+
+            const card = flashcardsData[currentIndex];
+            if (!card || !card.audioUrl) return;
+
+            const currentAudioEl = document.getElementById(`audio-${card.id}`);
+            if (!currentAudioEl) return;
+
+            if (isPlaying) {
+                currentAudioEl.pause();
+                isPlaying = false;
+                updatePlayButtonUI();
+            } else {
+                pauseAllAudio();
+                currentAudioEl.currentTime = 0;
+                
+                currentAudioEl.play().then(() => {
+                    isPlaying = true;
+                    updatePlayButtonUI();
+                }).catch(err => {
+                    console.error(`Playback failed for URL: ${currentAudioEl.src}`, err);
+                    isPlaying = false;
+                    updatePlayButtonUI();
+                });
+            }
+        }
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            addCardForm.reset();
+        }
+
+        function handleAddCard(e) {
+            e.preventDefault();
+            
+            const blackfeetText = document.getElementById('input-blackfeet').value.trim();
+            const englishText = document.getElementById('input-english').value.trim();
+            let audioUrlText = document.getElementById('input-audio').value.trim();
+
+            if (!blackfeetText || !englishText) return;
+
+            audioUrlText = sanitizeGithubUrl(audioUrlText);
+
+            // Give it a temporary unique ID
+            const newId = flashcardsData.length > 0 ? Math.max(...flashcardsData.map(c => c.id || 0)) + 1 : 1;
+
+            const newCard = {
+                id: newId,
+                blackfeet: blackfeetText,
+                english: englishText,
+                audioUrl: audioUrlText || null
+            };
+
+            // Push to local memory array
+            flashcardsData.push(newCard);
+            
+            closeModal();
+
+            // Move to the newly added card
+            if (isFlipped) toggleFlip();
+            setTimeout(() => {
+                currentIndex = flashcardsData.length - 1;
+                syncAudioElements();
+                createDots();
+                renderCard(currentIndex);
+            }, 500);
+        }
+
+        cardContainer.addEventListener('click', toggleFlip);
+        btnNext.addEventListener('click', handleNext);
+        btnPrev.addEventListener('click', handlePrev);
+        playBtnFront.addEventListener('click', toggleAudio);
+        playBtnBack.addEventListener('click', toggleAudio);
+
+        btnOpenModal.addEventListener('click', openModal);
+        btnCloseModal.addEventListener('click', closeModal);
+        addCardForm.addEventListener('submit', handleAddCard);
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        init();
+    </script>
+</body>
+</html>
