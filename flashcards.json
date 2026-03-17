@@ -16,5 +16,11 @@
     "blackfeet": "Áíkia'piiwa",
     "english": "What's happening?",
     "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/aikiapiiwa.mp3"
+  },
+  {
+    "id": 4,
+    "blackfeet": "Mamia'tsikimi",
+    "english": "Magpie",
+    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/birds-magpie.mp3"
   }
 ]
