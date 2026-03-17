@@ -26,7 +26,25 @@
   {
     "id": 5,
     "blackfeet": "Omahkai'stoo",
-    "english": "Ravene",
+    "english": "Raven",
     "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/sounds/birds_raven.mp3"
+  },
+  {
+    "id": 6,
+    "blackfeet": "Ki annahk aanistsiwa",
+    "english": "That's the plan, let it be that way",
+    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/sounds/thats-the-plan.mp3"
+  },
+  {
+    "id": 7,
+    "blackfeet": "Anni iihtopiit",
+    "english": "Sit there",
+    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/sounds/sit-there.mp3"
+  },
+  {
+    "id": 8,
+    "blackfeet": "Nikaomatsipiiyohsi",
+    "english": "I Called My Spirit (to join me as I travel)",
+    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/sounds/call-your-spirit.mp3"
   }
 ]
