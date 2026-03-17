@@ -111,18 +111,56 @@
                 </p>
             </div>
 
-            <!-- BACK OF CARD (English) -->
-            <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-[#FFF] rounded-3xl flex flex-col items-center justify-center text-[#2C1E16] shadow-inner border-4 border-[#2C1E16] overflow-hidden">
+            <!-- BACK OF CARD (English) - Inverted Design -->
+            <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-[#2C1E16] rounded-3xl flex flex-col items-center justify-center text-[#F0E5D1] shadow-inner border-4 border-[#F0E5D1] overflow-hidden">
                 
-                <!-- Mountain Background Image -->
-                <div id="bg-loading" class="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-[#F0E5D1] z-0">
-                    <i class="ph ph-spinner-gap text-4xl animate-spin text-[#005B9A] mb-2"></i>
-                    <span class="text-sm text-[#005B9A] font-medium animate-pulse">Painting background...</span>
+                <!-- Tribal Geometric Border Top -->
+                <div class="absolute top-0 inset-x-0 h-16 pointer-events-none opacity-90">
+                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
+                        <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                    </svg>
                 </div>
-                <img id="bg-image" src="" alt="Mountain Landscape" class="absolute inset-0 w-full h-full object-cover z-0 hidden" />
-                
-                <!-- Light Overlay for text readability -->
-                <div class="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-0"></div>
+
+                <!-- Tribal Geometric Border Bottom -->
+                <div class="absolute bottom-0 inset-x-0 h-16 pointer-events-none opacity-90 rotate-180">
+                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
+                        <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <!-- Tribal Geometric Border Left -->
+                <div class="absolute inset-y-0 left-0 w-8 pointer-events-none opacity-90">
+                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
+                        <polygon points="0,15 20,25 0,35" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="0,65 20,75 0,85" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <!-- Tribal Geometric Border Right -->
+                <div class="absolute inset-y-0 right-0 w-8 pointer-events-none opacity-90">
+                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
+                        <polygon points="20,15 0,25 20,35" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        <polygon points="20,65 0,75 20,85" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                    </svg>
+                </div>
 
                 <!-- Content -->
                 <div class="relative z-10 flex flex-col items-center justify-center p-8 w-full h-full">
@@ -130,12 +168,12 @@
                         <i class="ph ph-spinner-gap animate-spin"></i>
                     </h2>
                     
-                    <button id="play-btn-back" class="hidden w-16 h-16 items-center justify-center rounded-full transition-all duration-300 bg-white/60 backdrop-blur-sm text-[#2C1E16] hover:bg-white hover:text-[#005B9A] focus:outline-none border-2 border-[#2C1E16]/30 hover:border-[#005B9A] shadow-sm" title="Play Audio">
+                    <button id="play-btn-back" class="hidden w-16 h-16 items-center justify-center rounded-full transition-all duration-300 bg-white/20 backdrop-blur-sm text-[#F0E5D1] hover:bg-white hover:text-[#2C1E16] focus:outline-none border-2 border-[#F0E5D1]/30 hover:border-[#F0E5D1] shadow-sm" title="Play Audio">
                         <i class="ph ph-speaker-high text-3xl"></i>
                     </button>
                     <div id="spacer-back" class="h-16 hidden"></div>
 
-                    <p class="absolute bottom-6 text-[#2C1E16]/70 font-medium text-sm flex items-center gap-2">
+                    <p class="absolute bottom-6 text-[#F0E5D1]/70 font-medium text-sm flex items-center gap-2">
                         <i class="ph ph-arrows-clockwise"></i> Click to flip
                     </p>
                 </div>
@@ -211,7 +249,6 @@
         let currentIndex = 0;
         let isFlipped = false;
         let isPlaying = false;
-        let bgGenerated = false;
 
         // DOM Elements
         const cardContainer = document.getElementById('card-container');
@@ -267,11 +304,6 @@
                 syncAudioElements();
                 createDots();
                 renderCard(currentIndex);
-                
-                if (!bgGenerated) {
-                    generateBackgroundImage();
-                    bgGenerated = true;
-                }
 
             } catch (err) {
                 console.error("Initialization error:", err);
@@ -288,54 +320,6 @@
                 syncAudioElements();
                 createDots();
                 renderCard(currentIndex);
-                if (!bgGenerated) {
-                    generateBackgroundImage();
-                    bgGenerated = true;
-                }
-            }
-        }
-
-        async function fetchWithBackoff(url, options, retries = 5) {
-            const delays = [1000, 2000, 4000, 8000, 16000];
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return await response.json();
-                } catch (err) {
-                    if (i === retries - 1) throw err;
-                    await new Promise(res => setTimeout(res, delays[i]));
-                }
-            }
-        }
-
-        async function generateBackgroundImage() {
-            const apiKey = ""; 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
-            const promptText = "A beautiful, vibrant extreme wide-angle watercolor landscape painting of Chief Mountain in Glacier National Park, Montana seen from a vast distance. The horizon line is positioned low, exactly one-third up from the bottom edge of the canvas, allowing an expansive, large dynamic blue sky to dominate the top two-thirds of the frame. The distinct, massive blocky square-shaped rocky monolith sits dramatically in the distant grassy plains, positioned off-center towards the right side of the canvas. Expressive brush strokes, vast sweeping artistic landscape.";
-            
-            try {
-                const result = await fetchWithBackoff(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        instances: { prompt: promptText },
-                        parameters: { sampleCount: 1 }
-                    })
-                });
-                
-                if (result.predictions && result.predictions[0]) {
-                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    const imgEl = document.getElementById('bg-image');
-                    imgEl.src = imageUrl;
-                    imgEl.classList.remove('hidden');
-                    document.getElementById('bg-loading').classList.add('hidden');
-                } else {
-                    throw new Error("No image generated");
-                }
-            } catch (err) {
-                console.error("Failed to generate background image.", err);
-                document.getElementById('bg-loading').innerHTML = '<span class="text-sm text-[#C22026] font-medium text-center px-4">Failed to paint background.</span>';
             }
         }
 
@@ -447,13 +431,13 @@
                 playBtnFront.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-[#C22026] text-[#F0E5D1] shadow-lg scale-110 focus:outline-none border-2 border-[#C22026]";
                 iconFront.className = "ph ph-speaker-high text-3xl animate-pulse";
                 
-                playBtnBack.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-[#005B9A] text-white shadow-lg scale-110 focus:outline-none border-2 border-[#005B9A]";
+                playBtnBack.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-[#ECA400] text-white shadow-lg scale-110 focus:outline-none border-2 border-[#ECA400]";
                 iconBack.className = "ph ph-speaker-high text-3xl animate-pulse";
             } else {
                 playBtnFront.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 focus:outline-none border-2 border-[#2C1E16] text-[#2C1E16] bg-transparent hover:bg-[#ECA400]";
                 iconFront.className = "ph ph-speaker-high text-3xl";
 
-                playBtnBack.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-white/60 backdrop-blur-sm text-[#2C1E16] hover:bg-white hover:text-[#005B9A] focus:outline-none border-2 border-[#2C1E16]/30 hover:border-[#005B9A] shadow-sm";
+                playBtnBack.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-white/10 backdrop-blur-sm text-[#F0E5D1] hover:bg-white hover:text-[#2C1E16] focus:outline-none border-2 border-[#F0E5D1]/30 hover:border-[#F0E5D1] shadow-sm";
                 iconBack.className = "ph ph-speaker-high text-3xl";
             }
         }
