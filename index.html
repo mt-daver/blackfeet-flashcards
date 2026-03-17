@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blackfooot Flashcards</title>
+    <title>Blackfoot Flashcards</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -15,273 +15,261 @@
         }
         .rotate-y-180 { transform: rotateY(180deg); }
         #card-inner { transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); }
+        
+        /* Fixed Background Layer with Contain and Blue Fill */
+        .page-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #001a33; 
+            background-image: url("https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/68fcd038e2ea299ec865f0f5a3ea3a62e54a0a8b/chief-mtn-bg.png");
+            background-size: contain;
+            background-position: center; 
+            background-repeat: no-repeat;
+            z-index: -2;
+        }
+
+        /* Subtle overlay to ensure UI elements remain readable */
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.15);
+            z-index: -1;
+        }
+
+        /* Glow effect for the Title */
+        .text-glow {
+            color: rgb(247, 247, 242);
+            text-shadow: 
+                0 0 10px rgba(234, 164, 0, 0.4),
+                0 0 20px rgba(234, 164, 0, 0.2);
+            animation: glow-pulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow-pulse {
+            from {
+                text-shadow: 0 0 8px rgba(234, 164, 0, 0.3), 0 0 15px rgba(234, 164, 0, 0.1);
+            }
+            to {
+                text-shadow: 0 0 15px rgba(234, 164, 0, 0.6), 0 0 30px rgba(234, 164, 0, 0.3);
+            }
+        }
+
+        /* Subtle outer glow for the card container */
+        .card-glow {
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.3), 0 0 15px rgba(234, 164, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 font-sans text-slate-800 relative">
+<body class="min-h-screen flex flex-col items-center justify-center p-6 font-sans text-slate-800 relative">
+
+    <!-- Background Layers -->
+    <div class="page-background"></div>
+    <div class="bg-overlay"></div>
 
     <!-- Container for dynamic audio elements -->
     <div id="audio-container" class="hidden"></div>
 
-    <!-- Top Navigation / Add Button -->
-    <div class="absolute top-6 right-6 z-50">
-        <button id="btn-open-modal" class="p-3 rounded-full bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-[#ECA400] hover:text-white hover:border-[#ECA400] transition-colors focus:outline-none focus:ring-2 focus:ring-[#ECA400] focus:ring-offset-2" title="Test New Card">
-            <i class="ph ph-plus text-2xl"></i>
-        </button>
-    </div>
+    <!-- Main Content Wrapper -->
+    <div class="relative z-10 flex flex-col items-center">
+        <!-- Header -->
+        <div class="mb-12 text-center space-y-2">
+            <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-glow">
+                Blackfoot Language Cards
+            </h1>
+            <p class="text-[#2C1E16] font-bold tracking-widest uppercase text-xs bg-white/50 px-4 py-1.5 rounded-full backdrop-blur-sm inline-block shadow-sm" id="card-counter">
+                Loading cards...
+            </p>
+        </div>
 
-    <!-- Header -->
-    <div class="mb-8 text-center space-y-2">
-        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
-            Blackfoot Language Cards
-        </h1>
-        <p class="text-slate-500 font-medium" id="card-counter">
-            Loading cards from GitHub...
-        </p>
-    </div>
-
-    <!-- Flashcard Area -->
-    <div class="w-full max-w-lg h-80 cursor-pointer group perspective-1000" id="card-container">
-        <div id="card-inner" class="relative w-full h-full transform-style-3d shadow-xl rounded-3xl">
-            
-            <!-- FRONT OF CARD (Blackfeet) -->
-            <div class="absolute inset-0 w-full h-full backface-hidden bg-[#F0E5D1] rounded-3xl flex flex-col items-center justify-center border-4 border-[#2C1E16] overflow-hidden">
+        <!-- Flashcard Area -->
+        <div class="w-full max-w-lg h-80 cursor-pointer group perspective-1000" id="card-container">
+            <div id="card-inner" class="relative w-full h-full transform-style-3d rounded-3xl card-glow">
                 
-                <!-- Tribal Geometric Border Top -->
-                <div class="absolute top-0 inset-x-0 h-16 pointer-events-none opacity-90">
-                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
-                        <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-
-                <!-- Tribal Geometric Border Bottom -->
-                <div class="absolute bottom-0 inset-x-0 h-16 pointer-events-none opacity-90 rotate-180">
-                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
-                        <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-
-                <!-- Tribal Geometric Border Left -->
-                <div class="absolute inset-y-0 left-0 w-8 pointer-events-none opacity-90">
-                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
-                        <polygon points="0,15 20,25 0,35" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="0,65 20,75 0,85" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-
-                <!-- Tribal Geometric Border Right -->
-                <div class="absolute inset-y-0 right-0 w-8 pointer-events-none opacity-90">
-                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
-                        <polygon points="20,15 0,25 20,35" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="20,65 0,75 20,85" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-
-                <!-- Front Content -->
-                <div class="relative z-10 px-12 text-center flex flex-col items-center">
-                    <h2 id="text-blackfeet" class="text-3xl md:text-4xl font-semibold text-center mb-6 text-[#2C1E16] leading-tight">
-                        <i class="ph ph-spinner-gap animate-spin"></i>
-                    </h2>
+                <!-- FRONT OF CARD (Blackfeet) -->
+                <div class="absolute inset-0 w-full h-full backface-hidden bg-[#F0E5D1]/95 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center border-4 border-[#2C1E16] overflow-hidden">
                     
-                    <button id="play-btn-front" class="hidden w-16 h-16 items-center justify-center rounded-full transition-all duration-300 focus:outline-none border-2 border-[#2C1E16] text-[#2C1E16] bg-transparent hover:bg-[#ECA400]" title="Play Audio">
-                        <i class="ph ph-speaker-high text-3xl"></i>
-                    </button>
-                    <div id="spacer-front" class="h-16 hidden"></div>
-                </div>
-                
-                <p class="absolute bottom-6 text-[#2C1E16]/60 font-medium text-sm flex items-center gap-2">
-                    <i class="ph ph-arrows-clockwise"></i> Click to flip
-                </p>
-            </div>
+                    <!-- Tribal Geometric Border Top -->
+                    <div class="absolute top-0 inset-x-0 h-16 pointer-events-none opacity-90">
+                        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
+                            <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
 
-            <!-- BACK OF CARD (English) - Inverted Design -->
-            <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-[#2C1E16] rounded-3xl flex flex-col items-center justify-center text-[#F0E5D1] shadow-inner border-4 border-[#F0E5D1] overflow-hidden">
-                
-                <!-- Tribal Geometric Border Top -->
-                <div class="absolute top-0 inset-x-0 h-16 pointer-events-none opacity-90">
-                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
-                        <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+                    <!-- Tribal Geometric Border Bottom -->
+                    <div class="absolute bottom-0 inset-x-0 h-16 pointer-events-none opacity-90 rotate-180">
+                        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
+                            <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
 
-                <!-- Tribal Geometric Border Bottom -->
-                <div class="absolute bottom-0 inset-x-0 h-16 pointer-events-none opacity-90 rotate-180">
-                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
-                        <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+                    <!-- Tribal Geometric Border Left -->
+                    <div class="absolute inset-y-0 left-0 w-8 pointer-events-none opacity-90">
+                        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
+                            <polygon points="0,15 20,25 0,35" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="0,65 20,75 0,85" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
 
-                <!-- Tribal Geometric Border Left -->
-                <div class="absolute inset-y-0 left-0 w-8 pointer-events-none opacity-90">
-                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
-                        <polygon points="0,15 20,25 0,35" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="0,65 20,75 0,85" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+                    <!-- Tribal Geometric Border Right -->
+                    <div class="absolute inset-y-0 right-0 w-8 pointer-events-none opacity-90">
+                        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
+                            <polygon points="20,15 0,25 20,35" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="20,65 0,75 20,85" fill="#005B9A" stroke="#2C1E16" stroke-width="0.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
 
-                <!-- Tribal Geometric Border Right -->
-                <div class="absolute inset-y-0 right-0 w-8 pointer-events-none opacity-90">
-                    <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
-                        <polygon points="20,15 0,25 20,35" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                        <polygon points="20,65 0,75 20,85" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-
-                <!-- Content -->
-                <div class="relative z-10 flex flex-col items-center justify-center p-8 w-full h-full">
-                    <h2 id="text-english" class="text-3xl md:text-4xl font-medium text-center mb-8 leading-tight">
-                        <i class="ph ph-spinner-gap animate-spin"></i>
-                    </h2>
+                    <!-- Front Content -->
+                    <div class="relative z-10 px-12 text-center flex flex-col items-center">
+                        <h2 id="text-blackfeet" class="text-3xl md:text-4xl font-bold text-center mb-6 text-[#2C1E16] leading-tight">
+                            <i class="ph ph-spinner-gap animate-spin text-4xl text-[#005B9A]"></i>
+                        </h2>
+                        
+                        <button id="play-btn-front" class="hidden w-16 h-16 items-center justify-center rounded-full transition-all duration-300 focus:outline-none border-2 border-[#2C1E16] text-[#2C1E16] bg-transparent hover:bg-[#ECA400] hover:scale-105" title="Play Audio">
+                            <i class="ph ph-speaker-high text-3xl"></i>
+                        </button>
+                        <div id="spacer-front" class="h-16 hidden"></div>
+                    </div>
                     
-                    <button id="play-btn-back" class="hidden w-16 h-16 items-center justify-center rounded-full transition-all duration-300 bg-white/20 backdrop-blur-sm text-[#F0E5D1] hover:bg-white hover:text-[#2C1E16] focus:outline-none border-2 border-[#F0E5D1]/30 hover:border-[#F0E5D1] shadow-sm" title="Play Audio">
-                        <i class="ph ph-speaker-high text-3xl"></i>
-                    </button>
-                    <div id="spacer-back" class="h-16 hidden"></div>
-
-                    <p class="absolute bottom-6 text-[#F0E5D1]/70 font-medium text-sm flex items-center gap-2">
+                    <p class="absolute bottom-6 text-[#2C1E16]/50 font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
                         <i class="ph ph-arrows-clockwise"></i> Click to flip
                     </p>
                 </div>
+
+                <!-- BACK OF CARD (English) - Inverted Design -->
+                <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-[#2C1E16]/95 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center text-[#F0E5D1] shadow-inner border-4 border-[#F0E5D1] overflow-hidden">
+                    
+                    <!-- Inverted Tribal Geometric Border Top -->
+                    <div class="absolute top-0 inset-x-0 h-16 pointer-events-none opacity-90">
+                        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
+                            <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- Inverted Tribal Geometric Border Bottom -->
+                    <div class="absolute bottom-0 inset-x-0 h-16 pointer-events-none opacity-90 rotate-180">
+                        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 25">
+                            <polygon points="40,0 60,0 50,15" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="45,0 55,0 50,8" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="10,0 30,0 20,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="13,0 27,0 20,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="5,0 15,0 10,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="25,0 35,0 30,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="70,0 90,0 80,20" fill="#ECA400" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="73,0 87,0 80,15" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="65,0 75,0 70,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="85,0 95,0 90,7" fill="#C22026" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- Inverted Tribal Geometric Border Left -->
+                    <div class="absolute inset-y-0 left-0 w-8 pointer-events-none opacity-90">
+                        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
+                            <polygon points="0,15 20,25 0,35" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="0,65 20,75 0,85" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- Inverted Tribal Geometric Border Right -->
+                    <div class="absolute inset-y-0 right-0 w-8 pointer-events-none opacity-90">
+                        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 20 100">
+                            <polygon points="20,15 0,25 20,35" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                            <polygon points="20,65 0,75 20,85" fill="#005B9A" stroke="#F0E5D1" stroke-width="0.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="relative z-10 flex flex-col items-center justify-center p-8 w-full h-full">
+                        <h2 id="text-english" class="text-3xl md:text-4xl font-medium text-center mb-8 leading-tight text-[#F0E5D1]">
+                            <i class="ph ph-spinner-gap animate-spin text-4xl text-[#ECA400]"></i>
+                        </h2>
+                        
+                        <button id="play-btn-back" class="hidden w-16 h-16 items-center justify-center rounded-full transition-all duration-300 bg-white/10 backdrop-blur-sm text-[#F0E5D1] hover:bg-white hover:text-[#2C1E16] focus:outline-none border-2 border-[#F0E5D1]/30 hover:border-[#F0E5D1] shadow-sm" title="Play Audio">
+                            <i class="ph ph-speaker-high text-3xl"></i>
+                        </button>
+                        <div id="spacer-back" class="h-16 hidden"></div>
+
+                        <p class="absolute bottom-6 text-[#F0E5D1]/50 font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
+                            <i class="ph ph-arrows-clockwise"></i> Click to flip
+                        </p>
+                    </div>
+                </div>
+
             </div>
-
-        </div>
-    </div>
-
-    <!-- Navigation Controls -->
-    <div class="mt-10 flex items-center gap-6">
-        <button id="btn-prev" class="p-3 rounded-full bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-[#005B9A] transition-colors focus:outline-none focus:ring-2 focus:ring-[#005B9A] focus:ring-offset-2" aria-label="Previous card">
-            <i class="ph ph-arrow-left text-2xl"></i>
-        </button>
-        
-        <div class="flex gap-2 flex-wrap justify-center max-w-[200px]" id="dots-container">
-            <!-- Dots inserted via JS -->
         </div>
 
-        <button id="btn-next" class="p-3 rounded-full bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-[#005B9A] transition-colors focus:outline-none focus:ring-2 focus:ring-[#005B9A] focus:ring-offset-2" aria-label="Next card">
-            <i class="ph ph-arrow-right text-2xl"></i>
-        </button>
-    </div>
-
-    <!-- Add Card Modal -->
-    <div id="add-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative overflow-hidden border-2 border-[#2C1E16]">
-            <!-- Decorative Modal Header -->
-            <div class="absolute top-0 inset-x-0 h-2 bg-[#ECA400]"></div>
-            
-            <button id="btn-close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-[#C22026] transition-colors">
-                <i class="ph ph-x text-2xl"></i>
+        <!-- Navigation Controls (Explicit size for perfect circle) -->
+        <div class="mt-12 flex items-center gap-8">
+            <button id="btn-prev" class="w-16 h-16 rounded-full bg-white/80 backdrop-blur-sm text-slate-600 shadow-lg border border-slate-200 hover:bg-slate-50 hover:text-[#005B9A] transition-all hover:scale-105 active:scale-95 flex items-center justify-center" aria-label="Previous card">
+                <i class="ph ph-caret-left text-2xl"></i>
             </button>
             
-            <h3 class="text-2xl font-bold text-[#2C1E16] mb-6">Test a New Card</h3>
-            <p class="text-sm text-slate-500 mb-4 pb-4 border-b">Cards added here are temporary. To save them permanently, add them to your <code class="bg-slate-100 px-1 rounded">flashcards.json</code> file on GitHub!</p>
-            
-            <form id="add-card-form" class="space-y-4">
-                <div>
-                    <label for="input-blackfeet" class="block text-sm font-bold text-[#005B9A] uppercase tracking-wider mb-1">Blackfeet Word *</label>
-                    <input type="text" id="input-blackfeet" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#005B9A] focus:border-transparent transition-all" placeholder="e.g. Oki">
-                </div>
-                
-                <div>
-                    <label for="input-english" class="block text-sm font-bold text-[#ECA400] uppercase tracking-wider mb-1">English Translation *</label>
-                    <input type="text" id="input-english" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#ECA400] focus:border-transparent transition-all" placeholder="e.g. Hello">
-                </div>
-                
-                <div>
-                    <label for="input-audio" class="block text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Audio URL (Optional)</label>
-                    <input type="url" id="input-audio" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all" placeholder="https://raw.githubusercontent.com/...">
-                    <p class="text-xs text-slate-400 mt-1">Paste a GitHub link to your .mp3 file here.</p>
-                </div>
-                
-                <div class="pt-4">
-                    <button type="submit" id="submit-card-btn" class="w-full py-4 bg-[#2C1E16] hover:bg-[#C22026] text-white rounded-xl font-bold text-lg transition-colors shadow-md disabled:opacity-50">
-                        Add to Deck (Temporary)
-                    </button>
-                </div>
-            </form>
+            <button id="btn-next" class="w-16 h-16 rounded-full bg-white/80 backdrop-blur-sm text-slate-600 shadow-lg border border-slate-200 hover:bg-slate-50 hover:text-[#005B9A] transition-all hover:scale-105 active:scale-95 flex items-center justify-center" aria-label="Next card">
+                <i class="ph ph-caret-right text-2xl"></i>
+            </button>
         </div>
     </div>
 
-    <!-- Script Logic -->
     <script>
-        // =========================================================================
-        // YOUR GITHUB JSON FILE URL 
-        // We use the "raw" version to avoid CORS and HTML-parsing errors.
-        // =========================================================================
-        const GITHUB_JSON_URL = "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/main/flashcards.json";
-
-        // State
+        const GITHUB_JSON_URL = "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/flashcards.json";
         let flashcardsData = [];
         let currentIndex = 0;
         let isFlipped = false;
         let isPlaying = false;
 
-        // DOM Elements
         const cardContainer = document.getElementById('card-container');
         const cardInner = document.getElementById('card-inner');
         const textBlackfeet = document.getElementById('text-blackfeet');
         const textEnglish = document.getElementById('text-english');
         const cardCounter = document.getElementById('card-counter');
-        const dotsContainer = document.getElementById('dots-container');
-        
         const playBtnFront = document.getElementById('play-btn-front');
         const playBtnBack = document.getElementById('play-btn-back');
         const spacerFront = document.getElementById('spacer-front');
         const spacerBack = document.getElementById('spacer-back');
-
         const btnPrev = document.getElementById('btn-prev');
         const btnNext = document.getElementById('btn-next');
 
-        const modal = document.getElementById('add-modal');
-        const btnOpenModal = document.getElementById('btn-open-modal');
-        const btnCloseModal = document.getElementById('btn-close-modal');
-        const addCardForm = document.getElementById('add-card-form');
-        const submitBtn = document.getElementById('submit-card-btn');
-
-        // URL Sanitizer to ensure we are always hitting raw endpoints
         function sanitizeGithubUrl(url) {
             if (!url) return url;
-            if (url.includes('github.com') && url.includes('/blob/')) {
-                return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-            }
+            if (url.includes('github.com') && url.includes('/blob/')) return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
             return url;
         }
 
-        // Fisher-Yates Shuffle Algorithm
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -290,43 +278,19 @@
             return array;
         }
 
-        // Initialization
         async function init() {
             try {
                 const targetUrl = sanitizeGithubUrl(GITHUB_JSON_URL);
                 const response = await fetch(targetUrl);
-                
-                if (!response.ok) {
-                    throw new Error("Could not load the JSON file.");
-                }
-
+                if (!response.ok) throw new Error("Fetch failed");
                 let data = await response.json();
-
-                if (data.length === 0) {
-                    document.getElementById('card-counter').innerHTML = `<span class="text-red-500 font-bold">No cards found in JSON.</span>`;
-                    return;
-                }
-
-                // Randomize the cards immediately after loading
                 flashcardsData = shuffleArray(data);
-
                 syncAudioElements();
-                createDots();
                 renderCard(currentIndex);
-
             } catch (err) {
-                console.error("Initialization error:", err);
-                document.getElementById('card-counter').innerHTML = `<span class="text-red-500">Failed to load JSON link. Loading defaults.</span>`;
-                
-                const defaults = [
-                    { id: 1, blackfeet: "Aahkitsimio'p niita'paisiksikimiyi", english: "Let's drink coffee.", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/eating_lets-drink-coffee.mp3" },
-                    { id: 2, blackfeet: "Aahsikskanaotonni", english: "Pleasant morning.", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/greetings_pleasant-morning.mp3" },
-                    { id: 3, blackfeet: "Áíkia'piiwa", english: "What's happening?", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfeet-flashcards/0377b1ff4dc6586befc3ee1f2a93fbec708c5b91/aikiapiiwa.mp3" }
-                ];
-                flashcardsData = shuffleArray(defaults);
-                
+                console.error(err);
+                flashcardsData = shuffleArray([{ id: 1, blackfeet: "Aahkitsimio'p niita'paisiksikimiyi", english: "Let's drink coffee.", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/eating_lets-drink-coffee.mp3" }, { id: 2, blackfeet: "Aahsikskanaotonni", english: "Pleasant morning.", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/greetings_pleasant-morning.mp3" }, { id: 3, blackfeet: "Áíkia'piiwa", english: "What's happening?", audioUrl: "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/aikiapiiwa.mp3" }]);
                 syncAudioElements();
-                createDots();
                 renderCard(currentIndex);
             }
         }
@@ -334,208 +298,70 @@
         function syncAudioElements() {
             const container = document.getElementById('audio-container');
             flashcardsData.forEach(card => {
-                if (card.audioUrl) {
-                    let audioEl = document.getElementById(`audio-${card.id}`);
-                    if (!audioEl) {
-                        audioEl = document.createElement('audio');
-                        audioEl.id = `audio-${card.id}`;
-                        audioEl.src = card.audioUrl;
-                        audioEl.preload = 'auto';
-                        audioEl.addEventListener('ended', () => {
-                            isPlaying = false;
-                            updatePlayButtonUI();
-                        });
-                        audioEl.addEventListener('error', (e) => {
-                            console.error(`Failed to load audio for card ${card.blackfeet} from URL: ${card.audioUrl}`);
-                        });
-                        container.appendChild(audioEl);
-                        audioEl.load();
-                    } else if (audioEl.src !== card.audioUrl) {
-                        audioEl.src = card.audioUrl;
-                        audioEl.load();
-                    }
+                if (card.audioUrl && !document.getElementById(`audio-${card.id}`)) {
+                    let audioEl = document.createElement('audio');
+                    audioEl.id = `audio-${card.id}`;
+                    audioEl.src = sanitizeGithubUrl(card.audioUrl);
+                    audioEl.preload = 'auto';
+                    audioEl.addEventListener('ended', () => { isPlaying = false; updatePlayButtonUI(); });
+                    container.appendChild(audioEl);
                 }
-            });
-        }
-
-        function createDots() {
-            dotsContainer.innerHTML = '';
-            flashcardsData.forEach((_, idx) => {
-                const dot = document.createElement('div');
-                dot.className = `h-2.5 rounded-full transition-all duration-300 mb-2 ${idx === currentIndex ? 'w-8 bg-[#005B9A]' : 'w-2.5 bg-slate-200'}`;
-                dotsContainer.appendChild(dot);
-            });
-        }
-
-        function pauseAllAudio() {
-            const allAudio = document.querySelectorAll('#audio-container audio');
-            allAudio.forEach(audio => {
-                audio.pause();
-                audio.currentTime = 0;
             });
         }
 
         function renderCard(index) {
             const card = flashcardsData[index];
-            if (!card) return; 
-            
+            if (!card) return;
             textBlackfeet.textContent = card.blackfeet;
             textEnglish.textContent = card.english;
-            cardCounter.textContent = `Card ${index + 1} of ${flashcardsData.length}`;
-
-            pauseAllAudio();
+            cardCounter.textContent = `${index + 1} / ${flashcardsData.length}`;
             isPlaying = false;
             updatePlayButtonUI();
-
-            if (card.audioUrl) {
-                playBtnFront.style.display = 'flex';
-                playBtnBack.style.display = 'flex';
-                spacerFront.style.display = 'none';
-                spacerBack.style.display = 'none';
-            } else {
-                playBtnFront.style.display = 'none';
-                playBtnBack.style.display = 'none';
-                spacerFront.style.display = 'block';
-                spacerBack.style.display = 'block';
-            }
-
-            Array.from(dotsContainer.children).forEach((dot, idx) => {
-                dot.className = `h-2.5 rounded-full transition-all duration-300 mb-2 ${idx === currentIndex ? 'w-8 bg-[#005B9A]' : 'w-2.5 bg-slate-200'}`;
-            });
+            const hasAudio = !!card.audioUrl;
+            playBtnFront.style.display = hasAudio ? 'flex' : 'none';
+            playBtnBack.style.display = hasAudio ? 'flex' : 'none';
+            spacerFront.style.display = hasAudio ? 'none' : 'block';
+            spacerBack.style.display = hasAudio ? 'none' : 'block';
         }
 
-        function toggleFlip() {
-            isFlipped = !isFlipped;
-            if (isFlipped) {
-                cardInner.classList.add('rotate-y-180');
-            } else {
-                cardInner.classList.remove('rotate-y-180');
-            }
-        }
-
-        function handleNext(e) {
-            if (e) e.stopPropagation();
-            if (isFlipped) toggleFlip();
-            setTimeout(() => {
-                currentIndex = (currentIndex + 1) % flashcardsData.length;
-                renderCard(currentIndex);
-            }, 150);
-        }
-
-        function handlePrev(e) {
-            if (e) e.stopPropagation();
-            if (isFlipped) toggleFlip();
-            setTimeout(() => {
-                currentIndex = (currentIndex - 1 + flashcardsData.length) % flashcardsData.length;
-                renderCard(currentIndex);
-            }, 150);
-        }
+        function toggleFlip() { isFlipped = !isFlipped; cardInner.classList.toggle('rotate-y-180', isFlipped); }
+        function handleNext(e) { if (e) e.stopPropagation(); if (isFlipped) toggleFlip(); setTimeout(() => { currentIndex = (currentIndex + 1) % flashcardsData.length; renderCard(currentIndex); }, 150); }
+        function handlePrev(e) { if (e) e.stopPropagation(); if (isFlipped) toggleFlip(); setTimeout(() => { currentIndex = (currentIndex - 1 + flashcardsData.length) % flashcardsData.length; renderCard(currentIndex); }, 150); }
 
         function updatePlayButtonUI() {
-            const iconFront = playBtnFront.querySelector('i');
-            const iconBack = playBtnBack.querySelector('i');
-
+            const iconF = playBtnFront.querySelector('i');
+            const iconB = playBtnBack.querySelector('i');
             if (isPlaying) {
-                playBtnFront.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-[#C22026] text-[#F0E5D1] shadow-lg scale-110 focus:outline-none border-2 border-[#C22026]";
-                iconFront.className = "ph ph-speaker-high text-3xl animate-pulse";
-                
+                playBtnFront.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-[#C22026] text-white shadow-lg scale-110 border-2 border-[#C22026]";
+                iconF.className = "ph ph-speaker-high text-3xl animate-pulse";
                 playBtnBack.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-[#ECA400] text-white shadow-lg scale-110 focus:outline-none border-2 border-[#ECA400]";
-                iconBack.className = "ph ph-speaker-high text-3xl animate-pulse";
+                iconB.className = "ph ph-speaker-high text-3xl animate-pulse";
             } else {
-                playBtnFront.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 focus:outline-none border-2 border-[#2C1E16] text-[#2C1E16] bg-transparent hover:bg-[#ECA400]";
-                iconFront.className = "ph ph-speaker-high text-3xl";
-
+                playBtnFront.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 focus:outline-none border-2 border-[#2C1E16] text-[#2C1E16] bg-transparent hover:bg-[#ECA400] hover:scale-105";
+                iconF.className = "ph ph-speaker-high text-3xl";
                 playBtnBack.className = "w-16 h-16 flex items-center justify-center rounded-full transition-all duration-300 bg-white/10 backdrop-blur-sm text-[#F0E5D1] hover:bg-white hover:text-[#2C1E16] focus:outline-none border-2 border-[#F0E5D1]/30 hover:border-[#F0E5D1] shadow-sm";
-                iconBack.className = "ph ph-speaker-high text-3xl";
+                iconB.className = "ph ph-speaker-high text-3xl";
             }
         }
 
         function toggleAudio(e) {
             e.stopPropagation();
-
             const card = flashcardsData[currentIndex];
-            if (!card || !card.audioUrl) return;
-
             const currentAudioEl = document.getElementById(`audio-${card.id}`);
             if (!currentAudioEl) return;
-
-            if (isPlaying) {
-                currentAudioEl.pause();
-                isPlaying = false;
-                updatePlayButtonUI();
-            } else {
-                pauseAllAudio();
-                currentAudioEl.currentTime = 0;
-                
-                currentAudioEl.play().then(() => {
-                    isPlaying = true;
-                    updatePlayButtonUI();
-                }).catch(err => {
-                    console.error(`Playback failed for URL: ${currentAudioEl.src}`, err);
-                    isPlaying = false;
-                    updatePlayButtonUI();
-                });
+            if (isPlaying) { currentAudioEl.pause(); isPlaying = false; } 
+            else { 
+                document.querySelectorAll('#audio-container audio').forEach(a => { a.pause(); a.currentTime = 0; });
+                currentAudioEl.play().then(() => { isPlaying = true; updatePlayButtonUI(); }).catch(console.error);
             }
+            updatePlayButtonUI();
         }
 
-        function openModal() {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeModal() {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            addCardForm.reset();
-        }
-
-        function handleAddCard(e) {
-            e.preventDefault();
-            
-            const blackfeetText = document.getElementById('input-blackfeet').value.trim();
-            const englishText = document.getElementById('input-english').value.trim();
-            let audioUrlText = document.getElementById('input-audio').value.trim();
-
-            if (!blackfeetText || !englishText) return;
-
-            audioUrlText = sanitizeGithubUrl(audioUrlText);
-
-            const newId = flashcardsData.length > 0 ? Math.max(...flashcardsData.map(c => c.id || 0)) + 1 : 1;
-
-            const newCard = {
-                id: newId,
-                blackfeet: blackfeetText,
-                english: englishText,
-                audioUrl: audioUrlText || null
-            };
-
-            flashcardsData.push(newCard);
-            
-            closeModal();
-
-            if (isFlipped) toggleFlip();
-            setTimeout(() => {
-                currentIndex = flashcardsData.length - 1;
-                syncAudioElements();
-                createDots();
-                renderCard(currentIndex);
-            }, 500);
-        }
-
-        cardContainer.addEventListener('click', toggleFlip);
-        btnNext.addEventListener('click', handleNext);
-        btnPrev.addEventListener('click', handlePrev);
-        playBtnFront.addEventListener('click', toggleAudio);
-        playBtnBack.addEventListener('click', toggleAudio);
-
-        btnOpenModal.addEventListener('click', openModal);
-        btnCloseModal.addEventListener('click', closeModal);
-        addCardForm.addEventListener('submit', handleAddCard);
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
+        cardContainer.onclick = toggleFlip;
+        btnNext.onclick = handleNext;
+        btnPrev.onclick = handlePrev;
+        playBtnFront.onclick = toggleAudio;
+        playBtnBack.onclick = toggleAudio;
         init();
     </script>
 </body>
