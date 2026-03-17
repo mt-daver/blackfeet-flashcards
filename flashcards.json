@@ -3,24 +3,24 @@
     "id": 1,
     "blackfeet": "Aahkitsimio'p niita'paisiksikimiyi",
     "english": "Let's drink coffee.",
-    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/eating_lets-drink-coffee.mp3"
+    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/sounds/eating_lets-drink-coffee.mp3"
   },
   {
     "id": 2,
     "blackfeet": "Aahsikskanaotonni",
     "english": "Pleasant morning.",
-    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/greetings_pleasant-morning.mp3"
+    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/sounds/greetings_pleasant-morning.mp3"
   },
   {
     "id": 3,
     "blackfeet": "Áíkia'piiwa",
     "english": "What's happening?",
-    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/aikiapiiwa.mp3"
+    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/sounds/aikiapiiwa.mp3"
   },
   {
     "id": 4,
     "blackfeet": "Mamia'tsikimi",
     "english": "Magpie",
-    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/birds_magpie.mp3"
+    "audioUrl": "https://raw.githubusercontent.com/mt-daver/blackfoot-flashcards/main/sounds/birds_magpie.mp3"
   }
 ]
